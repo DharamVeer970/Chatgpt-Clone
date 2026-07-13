@@ -7,25 +7,47 @@ Examples / Capabilities / Limitations landing screen, and the two-tone message
 thread - and caches every question and answer in MongoDB, so a repeated question
 is served from the database instead of hitting the API again.
 
+The goal is a faithful front-end clone backed by a small but complete Flask
+service: one page to render the interface, one JSON endpoint to answer
+questions, and a database layer that doubles as a cache. It is deliberately
+compact - a single `main.py`, one HTML template, and a sprinkle of vanilla
+JavaScript - so it is easy to read end to end and adapt.
+
 ## Screenshots
 
 ### Landing screen
+
 ![Landing screen](screenshots/home.png)
 
+The opening view, styled after ChatGPT's own welcome page. A dark sidebar on the
+left holds the **New Chat** button and the running list of past questions pulled
+from MongoDB. The main area centres the **ChatGPT** title over three columns -
+**Examples**, **Capabilities**, and **Limitations** - each with sample cards,
+and a **Send a Message** input pinned along the bottom.
+
 ### Chat view
+
 ![Chat view](screenshots/chat.png)
+
+After you send a message the landing panel is swapped out for the conversation
+thread. Your question appears in a plain row with a violet **U** avatar; the
+reply sits below it on a lighter band with a green **AI** avatar. The two-tone
+striping is the same trick the real ChatGPT uses to separate speaker turns.
 
 > The answer above reads "No OPENAI_API_KEY set" because the app was started
 > without a key, in UI-only mode. With a key configured, the model's reply
-> renders in that spot.
+> renders in that spot instead. The avatars are drawn as CSS badges rather than
+> external images, so the interface has no third-party dependencies at runtime.
 
 ## Features
 
-- ChatGPT-style dark UI, built with Tailwind
-- Ask a question and get an answer from the OpenAI API
-- Answers cached in MongoDB - a repeated question is served from the DB, no API call
-- Past questions listed in the sidebar
-- Runs without MongoDB or an API key, so the UI can be developed on its own
+- ChatGPT-style dark UI, built with Tailwind, with a landing screen and a chat thread
+- Ask a question and get an answer from the OpenAI Chat Completions API
+- Answers cached in MongoDB - a repeated question is served from the DB, no API call and no extra cost
+- Past questions listed in the sidebar, loaded from the database on page load
+- Graceful degradation: runs with no API key and no database, so the UI can be developed on its own
+- Configuration is entirely environment-driven - no keys, models, or connection strings hardcoded
+- Avatars rendered as CSS badges, so the page makes no third-party requests
 
 ## Tech stack
 
