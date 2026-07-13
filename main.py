@@ -1,52 +1,52 @@
 from flask import Flask, render_template, jsonify, request
 from flask_pymongo import PyMongo
 import os
-import openai
+from openai import OpenAI
 
-openai.api_key = "your openai key"
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+client = OpenAI() if os.environ.get("OPENAI_API_KEY") else None
 
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://2021pceaddharamveer012:Veeer426@cluster0.9en5ghq.mongodb.net/Chatgpt"
-mongo = PyMongo(app)
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
+# No MONGO_URI -> run without persistence so the UI still boots.
+mongo = PyMongo(app) if app.config["MONGO_URI"] else None
 
 
 @app.route("/")
 def home():
-    chats = mongo.db.chats.find({})
-    myChats = [chat for chat in chats]
-    print(chats)
+    myChats = list(mongo.db.chats.find({})) if mongo else []
     return render_template("index.html", myChats=myChats)
 
 
 @app.route("/api", methods=["GET", "POST"])
 def qa():
     if request.method == "POST":
-        print(request.json)
         question = request.json.get("question")
-        chat = mongo.db.chats.find_one({"question": question})
-        print(chat)
+
+        chat = mongo.db.chats.find_one({"question": question}) if mongo else None
         if chat:
-            data = {"question": question, "answer": f"{chat['answer']}"}
-            return jsonify(data)
-        else:
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=question,
-                temperature=1,
-                max_tokens=256,
-                top_p=1, 
-                frequency_penalty=0,
-                presence_penalty=0
-            )
-            print(response)
-            data = {"question": question,
-                    "answer": response["choices"][0]["text"]}
-            mongo.db.chats.insert_one(
-                {"question": question, "answer": response["choices"][0]["text"]})
-            return jsonify(data)
+            return jsonify({"question": question, "answer": chat["answer"]})
+
+        if not client:
+            return jsonify({
+                "question": question,
+                "answer": "No OPENAI_API_KEY set - running in UI-only mode.",
+            })
+
+        response = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=[{"role": "user", "content": question}],
+            temperature=1,
+            max_tokens=256,
+        )
+        answer = response.choices[0].message.content
+        if mongo:
+            mongo.db.chats.insert_one({"question": question, "answer": answer})
+        return jsonify({"question": question, "answer": answer})
     data = {"result": "I'm just a computer program, so I don't have feelings, but I'm here and ready to help you with any questions or tasks you have. How can I assist you today?"}
     return jsonify(data)
 
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
