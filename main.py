@@ -1,9 +1,13 @@
 from flask import Flask, render_template, jsonify, request
 from flask_pymongo import PyMongo
+from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+load_dotenv()
+
+# `or` not a get() default: a blank var in .env is "" and must still fall back.
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
 client = OpenAI() if os.environ.get("OPENAI_API_KEY") else None
 
 

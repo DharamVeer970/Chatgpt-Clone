@@ -50,27 +50,35 @@ npm install
 
 ### 2. Configure
 
-The app is configured entirely through environment variables. Nothing is
-required - any variable you leave unset simply disables that feature.
-
-| Variable         | Required | Default       | Purpose                                    |
-|------------------|----------|---------------|--------------------------------------------|
-| `OPENAI_API_KEY` | No       | *(unset)*     | Enables real answers. Unset = UI-only mode |
-| `MONGO_URI`      | No       | *(unset)*     | Enables history + caching. Unset = no persistence |
-| `OPENAI_MODEL`   | No       | `gpt-4o-mini` | Which chat model to use                    |
+Copy the example file and fill in what you have:
 
 ```bash
-# macOS / Linux
-export OPENAI_API_KEY="sk-..."
-export MONGO_URI="mongodb+srv://<user>:<password>@<cluster>/Chatgpt"
-
-# Windows (PowerShell)
-$env:OPENAI_API_KEY="sk-..."
-$env:MONGO_URI="mongodb+srv://<user>:<password>@<cluster>/Chatgpt"
+cp .env.example .env
 ```
 
-> **Never commit your API key or connection string.** Keep them in your
-> environment or a `.env` file - `.env` is already in `.gitignore`.
+Nothing in it is required - any value you leave blank simply disables that
+feature, and the app still runs.
+
+| Variable         | Required | Blank means                          |
+|------------------|----------|--------------------------------------|
+| `OPENAI_API_KEY` | No       | UI-only mode, no real answers        |
+| `MONGO_URI`      | No       | No chat history, no answer caching   |
+| `OPENAI_MODEL`   | No       | Defaults to `gpt-4o-mini`            |
+
+A filled-in `.env` looks like this:
+
+```ini
+OPENAI_API_KEY=sk-...
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>/Chatgpt
+OPENAI_MODEL=gpt-4o-mini
+```
+
+Real environment variables also work and take precedence over `.env`, which is
+handy in production.
+
+> **Never commit your API key or connection string.** `.env` is already in
+> `.gitignore` - keep your real values there, and only ever commit
+> `.env.example`.
 
 ### 3. Run
 
