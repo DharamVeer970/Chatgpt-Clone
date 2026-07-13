@@ -59,18 +59,21 @@ cp .env.example .env
 Nothing in it is required - any value you leave blank simply disables that
 feature, and the app still runs.
 
-| Variable         | Required | Blank means                          |
-|------------------|----------|--------------------------------------|
-| `OPENAI_API_KEY` | No       | UI-only mode, no real answers        |
-| `MONGO_URI`      | No       | No chat history, no answer caching   |
-| `OPENAI_MODEL`   | No       | Defaults to `gpt-4o-mini`            |
+| Variable         | Blank means                                       |
+|------------------|---------------------------------------------------|
+| `OPENAI_API_KEY` | UI-only mode, no real answers                     |
+| `OPENAI_MODEL`   | UI-only mode - set it to the model you want       |
+| `MONGO_URI`      | No chat history, no answer caching                |
+
+Nothing is hardcoded in the app - the model is whatever you put in `.env`. To
+get real answers you need both a key and a model.
 
 A filled-in `.env` looks like this:
 
 ```ini
 OPENAI_API_KEY=sk-...
-MONGO_URI=mongodb+srv://<user>:<password>@<cluster>/Chatgpt
 OPENAI_MODEL=gpt-4o-mini
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>/Chatgpt
 ```
 
 Real environment variables also work and take precedence over `.env`, which is
